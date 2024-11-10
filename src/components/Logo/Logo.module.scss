@@ -1,0 +1,31 @@
+@use '../../utils/styles/' as *;
+
+.logo {
+  
+}
+
+.bubble {
+  @include animationPulsating;
+
+  margin: 0 auto 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background-image: url(../../../images/chat-bubble.webp);
+  background-repeat: no-repeat;
+  background-size: 100%;
+  height: 150px;
+  width: fit-content;
+}
+
+.title {
+  @include title--1;
+  @include animationPulsating;
+  @include shadowTextOutline;
+
+  margin: 10px 0 0;
+
+  color: $white;
+
+}

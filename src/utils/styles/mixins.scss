@@ -1,0 +1,93 @@
+@use './colors' as *;
+@use './variables' as *;
+
+@mixin on-tablet {
+  @media (min-width: $tablet-width) {
+    @content;
+  }
+}
+
+@mixin on-desktop {
+  @media (min-width: $desktop-width) {
+    @content;
+  }
+}
+
+@mixin resetList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin resetButton {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+@mixin resetLink {
+  color: $black;
+  text-decoration: none;
+}
+
+@mixin font--bangers {
+  font-family: "Bangers", serif;
+  letter-spacing: 3px;
+}
+
+@mixin font--comic {
+  font-family: "Bangers", serif;
+  letter-spacing: 3px;
+}
+
+@mixin title--1 {
+  @include font--bangers;
+
+  margin: 0 0 10px;
+}
+
+@mixin title--2 {
+  @include font--bangers;
+
+  margin: 0 0 10px;
+}
+
+@mixin title--3 {
+  @include font--bangers;
+
+  margin: 0 0 10px;
+}
+
+@mixin shadowTextOutline {
+  text-shadow:
+  -2px -2px 0 $black,
+  2px -2px 0 $black,
+  -2px 2px 0 $black,
+  2px 2px 0 $black;
+}
+
+@mixin hoverScale {
+transition: transform $transitionDuration;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+}
+
+@mixin animationPulsating {
+  animation: pulsating 5s infinite;
+  transform-origin: center;
+}
+
+@keyframes pulsating {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

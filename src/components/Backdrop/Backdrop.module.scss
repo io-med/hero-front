@@ -1,0 +1,26 @@
+.backdrop {
+  $bg-size: 30%;
+  position: fixed;
+  left: -45%;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+
+  background-image: url("../../../images/fog-texture.webp");
+  background-size: $bg-size;
+  opacity: 0.6;
+  transform: translateX($bg-size);
+
+  animation: drift 3s linear infinite;
+
+  @keyframes drift {
+    0% {
+      transform: translateX($bg-size);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+}
+

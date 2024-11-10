@@ -1,0 +1,17 @@
+@use '../../utils/styles/' as *;
+
+.homePage {
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+
+  background-color: $white;
+}
+
+.loader {
+  margin: 0 auto;
+}
+
+.error {
+  margin: 0 auto;
+}

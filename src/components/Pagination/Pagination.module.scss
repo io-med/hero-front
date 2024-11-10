@@ -1,0 +1,61 @@
+@use '../../utils/styles/' as *;
+
+.pagination {
+  display: flex;
+  gap: 16px;
+  width: fit-content;
+  margin: 0 auto 18px;
+}
+
+.list {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &SizeS {
+    @include on-tablet {
+      display: none;
+    }
+  }
+
+  &SizeL {
+    display: none;
+
+    @include on-tablet {
+      display: flex;
+    }
+  }
+}
+
+.button {
+  @include font--bangers;
+  @include hoverScale;
+  @include resetButton;
+
+  display: block;
+  width: 32px;
+  aspect-ratio: 1;
+
+  font-size: 20px;
+  background-color: $white;
+
+  user-select: none;
+  border: 2px solid $black;
+
+  &BorderLight {
+    border: 2px solid $grey;
+  }
+
+  &.active {
+    pointer-events: none;
+    border: 2px solid $black;
+  }
+
+  &.disabled {
+    border: 2px solid $grey;
+    color: $grey;
+    pointer-events: none;
+  }
+}

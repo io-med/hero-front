@@ -1,0 +1,178 @@
+@use '../../utils/styles/' as *;
+
+.heroForm {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 60px 20px 20px;
+
+  background-image: url("images/cardback.webp");
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  overflow-y: scroll;
+}
+
+.title {
+  @include font--bangers;
+  @include shadowTextOutline;
+
+  margin: 0 0 8px;
+
+  color: $white;
+  font-size: 24px;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-bottom: 16px;
+}
+
+.label {
+  @include font--bangers;
+  @include shadowTextOutline;
+
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+
+  font-size: 20px;
+  color: $white;
+}
+
+.input {
+  border: 2px solid $black;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.imageLabel {
+  @include font--bangers;
+
+  padding: 4px;
+
+  background-color: $white;
+  text-align: center;
+
+  border: 2px solid $black;
+}
+
+.imageInput {
+  display: none;
+}
+
+.images {
+  width: 100%;
+  aspect-ratio: 2;
+  
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.imagesList {
+  @include resetList;
+  height: 100%;
+  display: flex;
+  gap: 6px;
+}
+
+.imageItem {
+  position: relative;
+  height: 100%;
+}
+
+.image {
+  height: 100%;
+}
+
+.delete {
+  @include resetButton;
+  @include font--bangers;
+
+  position: absolute;
+  top: 4px;
+  right: 4px;
+
+  height: 26px;
+  aspect-ratio: 1;
+
+  background-color: $white;
+  font-size: 24px;
+  border: 1px solid black;
+}
+
+.save {
+  @include resetButton;
+  @include font--bangers;
+  @include hoverScale;
+
+  position: absolute;
+  bottom: -6px;
+  z-index: 1;
+
+  align-self: center;
+  padding: 6px;
+  width: 50%;
+
+  font-size: 16px;
+  background-color: $white;
+
+  border: 2px solid black;
+  border-radius: 12px 12px 0 0;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: $transpGrey;
+}
+
+.error {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+
+  background-color: $transpGrey;
+}
+
+.errorMessage {
+  max-width: 80%;
+  max-height: 80%;
+  padding: 12px;
+  margin: 0;
+  
+  background-color: $white;
+  font-size: 22px;
+  text-overflow: ellipsis;
+
+  border: 2px solid $black;
+}
+
+.errorButton {
+  @include resetButton;
+  @include font--bangers;
+
+  padding: 8px;
+
+  background-color: $black;
+  color: $white;
+  font-size: 16px;
+
+  border: 2px solid $white;
+}

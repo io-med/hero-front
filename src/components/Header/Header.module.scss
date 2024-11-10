@@ -1,0 +1,9 @@
+@use '../../utils/styles/' as *;
+
+.header {
+  padding: 2px;
+
+  background-color: $red;
+
+  border-bottom: 4px solid $black;
+}
