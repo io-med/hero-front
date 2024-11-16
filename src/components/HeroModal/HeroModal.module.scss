@@ -2,7 +2,8 @@
 
 .heroModal {
   position: fixed;
-  inset: 50%;
+  top: 50%;
+  left: 50%;
   z-index: 3;
   perspective: 1000px;
 
@@ -10,9 +11,17 @@
   max-width: 2 * $cardWidth;
   aspect-ratio: $cardAspectRatio;
   max-height: 100dvh;
-
   transform: translate(-50%, -50%);
   
+  opacity: 1;
+  
+  transition: all $transitionDuration;
+
+  &.initial {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+
   &.inEdit .inner {
     transform: rotateY(180deg);
   }
@@ -45,17 +54,13 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
 
-  -webkit-backface-visibility: hidden; /* Safari */
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   overflow: hidden;
 
   &Front {
-    padding: 10px;
+    pointer-events: all;
   }
 
   &Back {
@@ -64,195 +69,51 @@
   }
 }
 
-.title {
-  @include title--3;
-  @include shadowTextOutline;
-
-  position: relative;
-  z-index: 1;
-
-  margin: 0;
-
-  color: $white;
-}
-
-.details {
-  position: relative;
-  height: initial;
-  z-index: 1;
-
-  box-sizing: border-box;
-  height: 50%;
-  padding: 12px;
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  color: $black;
-  opacity: 1;
-  background-color: $white;
-  border: 3px solid $black;
-  box-shadow: 6px 6px 0px $black;
-
-  transform: translateY(0);
-
-  transition: transform $transitionDuration $transitionDuration;
-  overflow-y: scroll;
-  scrollbar-color: $black $white;
-  scrollbar-width: thin;
-
-  &.hidden {
-    height: 0;
-
-    transform: translateY(100%);
-    opacity: 0;
-  }
-}
-
-.detailTitle {
-  @include title--3;
-}
-
-.detailInfo {
-  margin: 0;
-}
-
-.image {
-  position: absolute;
-
-  inset: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-}
-
-.deselect {
+.button {
   @include resetButton;
   @include font--bangers;
   @include hoverScale;
 
   position: absolute;
-  top: 6px;
-  right: 6px;
   z-index: 1;
 
-  width: 10%;
-  min-width: 24px;
-  aspect-ratio: 1;
+  padding: 5px;
 
-  font-size: 24px;
   color: $black;
   background-color: $white;
+  font-size: 22px;
 
-  border-radius: 50%;
   box-shadow: 3px 3px 0 $black;
+
+  transition: transform $transitionDuration;
+
   cursor: pointer;
-  opacity: 1;
-  transition:
-    opacity $transitionDuration,
-    transform $transitionDuration;
   pointer-events: all;
 
-  &.hidden {
-    opacity: 0;
-    pointer-events: none;
+  &Front {
+    .inEdit & {
+      pointer-events: none;
+    }
   }
-}
 
-.edit {
-  @include resetButton;
-  @include font--bangers;
-  @include hoverScale;
+  &Deselect {
+    top: 6px;
+    right: 6px;
 
-  padding: 5px;
+    width: 10%;
+    min-width: 24px;
+    aspect-ratio: 1;
 
-  position: absolute;
-  top: 10px;
-  left: 6px;
-  z-index: 1;
-
-  color: $black;
-  background-color: $white;
-  font-size: 22px;
-  box-shadow: 3px 3px 0 $black;
-
-  cursor: pointer;
-
-  &.hidden {
-    opacity: 0;
-    pointer-events: none;
+    border-radius: 50%;
   }
-}
 
-.back {
-  @include resetButton;
-  @include font--bangers;
-  @include hoverScale;
+  &Edit {
+    top: 10px;
+    left: 6px;
+  }
 
-  position: absolute;
-  top: 10px;
-  left: 6px;
-  z-index: 1;
-
-  padding: 5px;
-
-  color: $black;
-  background-color: $white;
-  font-size: 22px;
-  box-shadow: 3px 3px 0 $black;
-
-  cursor: pointer;
-}
-
-.delete {
-  @include resetButton;
-  @include font--bangers;
-  @include hoverScale;
-
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  z-index: 1;
-
-  padding: 5px;
-
-  color: $black;
-  background-color: $white;
-  font-size: 22px;
-  box-shadow: 3px 3px 0 $black;
-
-  transform: translateX(-50%);
-
-  cursor: pointer;
-}
-
-.arrows {
-  position: absolute;
-  bottom: 55%;
-  left: 0;
-  right: 0;
-  z-index: 1;
-
-  padding-inline: 6px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.arrow {
-  @include resetButton;
-  @include font--bangers;
-
-  background-color: $white;
-  color: $black;
-
-  height: 36px;
-  width: 22px;
-
-  font-size: 30px;
-
-  border: 2px solid $black;
-  box-shadow: 2px 2px 0 $black;
+  &Back {
+    top: 10px;
+    left: 6px;
+  }
 }

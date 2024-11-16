@@ -2,7 +2,6 @@
 
 .heroForm {
   box-sizing: border-box;
-  width: 100%;
   height: 100%;
   padding: 60px 20px 20px;
 
@@ -36,6 +35,8 @@
   @include font--bangers;
   @include shadowTextOutline;
 
+  position: relative;
+
   margin-bottom: 8px;
   display: flex;
   flex-direction: column;
@@ -48,21 +49,90 @@
   border: 2px solid $black;
   height: 20px;
   border-radius: 4px;
+
+  &TextArea {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    height: max-content;
+    max-height: 100px;
+    min-height: 26px;
+
+    field-sizing: content;
+  }
+
+  &:user-invalid {
+    background-color: $lightOrange;
+  }
+}
+
+.inputError {
+  @include animationJumping;
+
+  display: none;
+
+  position: absolute;
+  top: 1px;
+  right: 4px;
+
+  padding: 6px;
+
+  font-size: 12px;
+  color: $red;
+  background-color: $white;
+  text-shadow: none;
+
+  border: 1px solid $black;
+
+  :user-invalid + & {
+    display: block;
+  }
 }
 
 .imageLabel {
   @include font--bangers;
 
-  padding: 4px;
+  position: relative;
+
+  padding: 6px;
+  flex-grow: 1;
 
   background-color: $white;
   text-align: center;
 
   border: 2px solid $black;
+
+  transition: flex-grow ($transitionDuration * 3);
+
+  cursor: pointer;
+}
+
+
+.selectedMark {
+  @include font--bangers;
+  @include resetButton;
+
+  padding: 2px;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: $lightOrange;
+  border: 1px solid $black;
+
+  cursor: pointer;
 }
 
 .imageInput {
   display: none;
+}
+
+.imageButtons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
 .images {
@@ -118,7 +188,7 @@
   padding: 6px;
   width: 50%;
 
-  font-size: 16px;
+  font-size: 22px;
   background-color: $white;
 
   border: 2px solid black;

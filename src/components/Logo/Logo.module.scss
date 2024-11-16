@@ -1,7 +1,7 @@
 @use '../../utils/styles/' as *;
 
 .logo {
-  
+  @include resetLink;
 }
 
 .bubble {
@@ -27,5 +27,4 @@
   margin: 10px 0 0;
 
   color: $white;
-
 }

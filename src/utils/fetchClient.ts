@@ -13,10 +13,16 @@ const request = async <T>(
   const options: RequestInit = {
     method,
     body: data ? JSON.stringify(data) : null,
-    headers : DEFAULT_HEADERS,
+    headers: DEFAULT_HEADERS,
   };
 
   const response = await fetch(`${BASE_URL}/${path}`, options);
+
+  if (!response.ok) {
+    return response.json().then(error => {
+      throw new Error(error.message);
+    });
+  }
 
   return response.json();
 };
@@ -34,7 +40,7 @@ const formRequest = async (
   const response = await fetch(`${BASE_URL}/${path}`, options);
 
   return response.json();
-}
+};
 
 export const client = {
   get<T>(path: string) {

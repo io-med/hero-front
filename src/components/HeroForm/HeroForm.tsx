@@ -3,60 +3,75 @@ import styles from './HeroForm.module.scss';
 import { Hero } from '../../types/Hero';
 import { patchHero, postHero } from '../../api/heroes';
 import { HeroServer } from '../../types/HeroServer';
-import { convertFromServerHero } from '../../utils/convertFromServerHero';
 import { addImage, deleteImage, getImageUrl } from '../../api/images';
 import { Loader } from '../Loader';
+import clsx from 'clsx';
+import { DeleteHero } from '../DeleteHero';
 
 type Props = {
-  hero?: Hero | null;
+  selectedHero?: Hero | null;
   setHeroes: React.Dispatch<React.SetStateAction<HeroServer[]>>;
-  flipBack: (hero: Hero) => void;
+  flipBack: (id: number) => void;
+  close: () => void;
 };
 
-export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
-  const [nickname, setNickName] = useState(hero?.nickname || '');
-  const [realName, setRealName] = useState(hero?.realName || '');
-  const [origin, setOrigin] = useState(hero?.origin || '');
-  const [powers, setPowers] = useState(hero?.powers || '');
-  const [phrase, setPhrase] = useState(hero?.phrase || '');
+export const HeroForm: React.FC<Props> = ({
+  selectedHero,
+  setHeroes,
+  flipBack,
+  close,
+}) => {
+  const [nickname, setNickName] = useState(selectedHero?.nickname || '');
+  const [realName, setRealName] = useState(selectedHero?.realName || '');
+  const [origin, setOrigin] = useState(selectedHero?.origin || '');
+  const [powers, setPowers] = useState(selectedHero?.powers || '');
+  const [phrase, setPhrase] = useState(selectedHero?.phrase || '');
   const [image, setImage] = useState<File | null>(null);
-  const [inCreateMode, setInCreateMode] = useState(!hero);
+  const [inCreateMode, setInCreateMode] = useState(!selectedHero);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleNickNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNickName(event.target.value);
+    setNickName(event.target.value.trimStart());
   };
 
   const handleRealNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRealName(event.target.value);
+    setRealName(event.target.value.trimStart());
   };
 
-  const handleOriginChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setOrigin(event.target.value);
+  const handleOriginChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setOrigin(event.target.value.trimStart());
   };
 
   const handlePowersChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPowers(event.target.value);
+    setPowers(event.target.value.trimStart());
   };
 
   const handlePhraseChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPhrase(event.target.value);
+    setPhrase(event.target.value.trimStart());
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
+      if (event.target.files[0].size > 5000000) {
+        setErrorMessage('Image file must be smaller then 5mb.')
+
+        return;
+      }
+      
       setImage(event.target.files[0]);
     }
   };
 
   const hasChanges =
-    hero &&
-    (nickname !== hero.nickname ||
-      realName !== hero.realName ||
-      origin !== hero.origin ||
-      powers !== hero.powers ||
-      phrase !== hero.phrase);
+    selectedHero &&
+    (nickname !== selectedHero.nickname ||
+      realName !== selectedHero.realName ||
+      origin !== selectedHero.origin ||
+      powers !== selectedHero.powers ||
+      phrase !== selectedHero.phrase);
 
   const disabled =
     (!hasChanges && !inCreateMode) ||
@@ -69,11 +84,10 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
     isLoading ||
     !!errorMessage;
 
-  const clearError = () => {
-    setErrorMessage('');
-  };
-
   const submitImage = async (heroId: number) => {
+    setIsLoading(true);
+    setErrorMessage('');
+
     const formData = new FormData();
     if (image) {
       formData.append('image', image);
@@ -84,9 +98,10 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
 
       return newImage;
     } catch (error) {
-      setErrorMessage("Image can't be loaded");
-      throw error;
+      setErrorMessage(`${error}`);
     }
+
+    setIsLoading(false);
   };
 
   const handleSubmitCreate = async (
@@ -94,7 +109,7 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
   ) => {
     event.preventDefault();
     setIsLoading(true);
-    clearError();
+    setErrorMessage('');
 
     try {
       const newHero = {
@@ -110,17 +125,17 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
       if (heroFromServer) {
         const image = await submitImage(heroFromServer.id);
 
-        if (image.body) {
+        if (image?.body) {
           heroFromServer.images.push(image.body);
         }
 
         setHeroes(curHeroes => [...curHeroes, heroFromServer]);
         setInCreateMode(false);
-        flipBack(convertFromServerHero(heroFromServer));
+        console.log('heroFromServer', heroFromServer);
+        flipBack(heroFromServer.id);
       }
     } catch (error) {
-      setErrorMessage('Hero cannot be created');
-      throw error;
+      setErrorMessage(`${error} Hero can\'t be created`);
     }
 
     setIsLoading(false);
@@ -129,8 +144,9 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
   const handleSubmitEdit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
+    setErrorMessage('');
 
-    if (hero?.id) {
+    if (selectedHero?.id) {
       const updatedHero: Partial<HeroServer> = {
         nickname,
         real_name: realName,
@@ -148,11 +164,11 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
       });
 
       try {
-        await patchHero(hero.id, updatedHero);
+        await patchHero(selectedHero.id, updatedHero);
 
         setHeroes(curHeroes => {
           return curHeroes.map(curHero => {
-            if (curHero.id === hero.id) {
+            if (curHero.id === selectedHero.id) {
               return { ...curHero, ...updatedHero };
             }
 
@@ -160,10 +176,9 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
           });
         });
 
-        flipBack({ ...hero, ...updatedHero });
+        flipBack(selectedHero.id);
       } catch (error) {
-        setErrorMessage('Hero cannot be updated');
-        throw error;
+        setErrorMessage(`${error}. Hero can\'t be changed`);
       }
     }
 
@@ -172,17 +187,14 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
 
   const handleImageDelete = async (image: string, id: number) => {
     setIsLoading(true);
+    setErrorMessage('');
 
     try {
       await deleteImage({ image }, id);
-      if (hero) {
-        hero.images = hero.images.filter(
-          existingImage => existingImage !== image,
-        );
-
+      if (selectedHero) {
         setHeroes(curHeroes => {
           return curHeroes.map(curHero => {
-            if (curHero.id !== hero.id) {
+            if (curHero.id !== selectedHero.id) {
               return curHero;
             }
 
@@ -196,33 +208,56 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
         });
       }
     } catch (error) {
-      setErrorMessage('Unable to delete!');
-      throw error;
+      setErrorMessage(`${error}. Hero can\'t be deleted`);
     }
 
     setIsLoading(false);
   };
 
-  const addImageWithoutSubmit = async () => {
-    try {
-      if (hero && image) {
-        const newImage = await submitImage(hero.id);
-        setImage(null);
-        hero.images.push(newImage.body);
-        setHeroes(curHeroes => {
-          return curHeroes.map(curHero => {
-            if (curHero.id === hero.id) {
-              return { ...curHero, images: [...curHero.images, newImage.body] };
-            }
+  const addRandomImage = async () => {
+    const baseURL = window.location.origin;
+    const imageIndex = Math.ceil(Math.random() * 22);
+    const imageURL = `${baseURL}/images/heroes/${imageIndex}.webp`;
 
-            return curHero;
+    try {
+      const image = await fetch(imageURL);
+      const imageData = await image.blob();
+      const imageFile = await new File([imageData], 'randomImage.webp');
+
+      setImage(imageFile);
+    } catch (error) {
+      setErrorMessage(`${error}. Image can\'t be added`);
+    }
+  };
+
+  const addImageWithoutSubmit = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      if (selectedHero && image) {
+        const newImage = await submitImage(selectedHero.id);
+        setImage(null);
+        if (newImage) {
+          setHeroes(curHeroes => {
+            return curHeroes.map(curHero => {
+              if (curHero.id === selectedHero.id) {
+                return {
+                  ...curHero,
+                  images: [...curHero.images, newImage.body],
+                };
+              }
+
+              return curHero;
+            });
           });
-        });
+        }
       }
     } catch (error) {
-      setErrorMessage('Unable to add!');
-      throw error;
+      setErrorMessage(`${error}. Image can\'t be added`);
     }
+
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -236,6 +271,17 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
       <h3 className={styles.title}>
         {inCreateMode ? 'Make your hero!' : 'Change your hero!'}
       </h3>
+
+      {selectedHero && (
+        <DeleteHero
+          setHeroes={setHeroes}
+          id={selectedHero.id}
+          setErrorMessage={setErrorMessage}
+          setIsLoading={setIsLoading}
+          close={close}
+        />
+      )}
+
       <form
         className={styles.form}
         onSubmit={inCreateMode ? handleSubmitCreate : handleSubmitEdit}
@@ -249,7 +295,9 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
             onChange={handleNickNameChange}
             placeholder="Super who?"
             maxLength={15}
+            required
           />
+          <div className={styles.inputError}>REQUIRED</div>
         </label>
 
         <label className={styles.label}>
@@ -261,19 +309,22 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
             onChange={handleRealNameChange}
             placeholder="Say my name!"
             maxLength={15}
+            required
           />
+          <div className={styles.inputError}>REQUIRED</div>
         </label>
 
         <label className={styles.label}>
           Origin:
-          <input
-            type="text"
-            className={styles.input}
+          <textarea
+            className={clsx(styles.input, styles.inputTextArea)}
             value={origin}
             onChange={handleOriginChange}
             placeholder="Fallen in toxic waste or...bitten by radioactive roach?!"
-            maxLength={100}
+            maxLength={200}
+            required
           />
+          <div className={styles.inputError}>REQUIRED</div>
         </label>
 
         <label className={styles.label}>
@@ -285,7 +336,9 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
             onChange={handlePowersChange}
             placeholder="Transparent eyelids, three ears.."
             maxLength={40}
+            required
           />
+          <div className={styles.inputError}>REQUIRED</div>
         </label>
 
         <label className={styles.label}>
@@ -297,19 +350,38 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
             onChange={handlePhraseChange}
             placeholder="What if I have nothing to say?"
             maxLength={30}
+            required
           />
+          <div className={styles.inputError}>REQUIRED</div>
         </label>
 
-        <label className={styles.imageLabel}>
-          add image
-          <input
-            type="file"
-            className={styles.imageInput}
-            onChange={handleImageChange}
-            accept="image/*"
-          />
-        </label>
+        <div className={styles.imageButtons}>
+          <label className={styles.imageLabel}>
+            {selectedHero ? 'Add image' : 'Select image'}
+            <input
+              type="file"
+              className={styles.imageInput}
+              onChange={handleImageChange}
+              accept="image/*"
+            />
+          </label>
 
+          {image && (
+            <button
+              className={styles.selectedMark}
+              onClick={() => {
+                setImage(null);
+              }}
+            >
+              deselect
+            </button>
+          )}
+
+          <label className={styles.imageLabel}>
+            Add random image
+            <input className={styles.imageInput} onClick={addRandomImage} />
+          </label>
+        </div>
         {(hasChanges || inCreateMode) && (
           <button type="submit" className={styles.save} disabled={disabled}>
             {inCreateMode ? 'create' : 'save'}
@@ -317,16 +389,16 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
         )}
       </form>
 
-      {hero?.images && hero.images.length > 0 && (
+      {selectedHero?.images && selectedHero.images.length > 0 && (
         <div className={styles.images}>
           <ul className={styles.imagesList}>
-            {hero.images.map(image => (
+            {selectedHero.images.map(image => (
               <li className={styles.imageItem} key={image}>
-                {hero.images.length !== 1 && (
+                {selectedHero.images.length !== 1 && (
                   <button
                     className={styles.delete}
                     onClick={() => {
-                      handleImageDelete(image, hero.id);
+                      handleImageDelete(image, selectedHero.id);
                     }}
                   >
                     x
@@ -345,7 +417,7 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
 
       {isLoading && (
         <div className={styles.loading}>
-          <Loader />
+          <Loader isWhite={true} />
         </div>
       )}
 
@@ -353,7 +425,10 @@ export const HeroForm: React.FC<Props> = ({ hero, setHeroes, flipBack }) => {
         <div className={styles.error}>
           <p className={styles.errorMessage}>{errorMessage}</p>
 
-          <button className={styles.errorButton} onClick={clearError}>
+          <button
+            className={styles.errorButton}
+            onClick={() => setErrorMessage('')}
+          >
             close
           </button>
         </div>

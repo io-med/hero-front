@@ -4,6 +4,12 @@
   width: fit-content;
   display: flex;
   align-items: flex-end;
+
+  &White {
+    @include shadowTextOutline;
+
+    color: $white;
+  }
 }
 
 .text {

@@ -1,0 +1,32 @@
+@use '../../utils/styles/' as *;
+
+.deleteHero {
+  @include resetButton;
+  @include font--bangers;
+  @include hoverScale;
+
+  position: absolute;
+
+  top: 10px;
+  left: 50%;
+  z-index: 1;
+
+  padding: 5px;
+
+  transform: translateX(-50%);
+
+  color: $black;
+  background-color: $white;
+  font-size: 22px;
+
+  box-shadow: 3px 3px 0 $black;
+
+  transition: transform $transitionDuration;
+
+  cursor: pointer;
+  pointer-events: all;
+
+  &:hover {
+    transform: translateX(-50%) scale(1.1);
+  }
+}
